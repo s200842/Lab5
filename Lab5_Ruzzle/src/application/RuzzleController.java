@@ -84,13 +84,16 @@ public class RuzzleController {
 
     @FXML
     void doGenera(ActionEvent event) {
+    	listResult.getItems().clear();
     	//Genera serie casuale di lettere nella griglia
     	for(Label l : labels){
     		l.setText(model.randomChar().toUpperCase());
     		lettere.add(new Lettera(l.getText()));
     	}
     	model.prepare(lettere);
-    	model.cercaParole();
+    	lettere.clear();
+    	List<String> result = model.cercaParole();
+    	listResult.getItems().setAll(result);
     }
 
     @FXML
