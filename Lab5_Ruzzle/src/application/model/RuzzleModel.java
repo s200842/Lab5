@@ -2,14 +2,20 @@ package application.model;
 
 import java.util.*;
 
+import application.db.LetteraDAO;
+
 public class RuzzleModel {
 	
-	List<String> parole;
-	Scacchiera griglia;
+	private List<Lettera> parole;
+	private Scacchiera griglia;
+	private LetteraDAO dao;
+	private List<Lettera> usate;
 	
 	public RuzzleModel(){
-		parole = new ArrayList<String>();
+		parole = new ArrayList<Lettera>();
 		griglia = new Scacchiera();
+		dao = new LetteraDAO();
+		usate = new ArrayList<Lettera>();
 	}
 	
 	public String randomChar(){
@@ -20,8 +26,52 @@ public class RuzzleModel {
 		return String.valueOf(Character.toChars(k));
 	}
 	
-	public void prepare(){
-		
+	public void prepare(List<Lettera> list){
+		int i = 0;
+		for(Posizione p : griglia.getPosizioniValide()){
+			//Inserisco nella griglia la lettera e aggiorno la sua posizione
+			griglia.getGriglia().put(p, list.get(i));
+			list.get(i).setP(p);
+			i++;
+		}
+	}
+	
+	public void cercaParole(){
+		for(int r=1; r<=4; r++){
+			for(int c=1; c<=4; c++){
+				usate.add(griglia.getGriglia().get(new Posizione(r, c)));
+				ricerca(griglia.getGriglia().get(new Posizione(r, c)));
+				usate.clear();
+			}
+		}
+	}
+	
+	public void ricerca(Lettera l){
+		int posRiga = l.getP().getRiga();
+		int posCol = l.getP().getColonna();
+		for(int c=posCol-1; c<=posCol+1; c++){
+			for(int r=posRiga-1; r<=posRiga+1; r++){
+				//Controllo validità posizione
+				if(r>=1 && r<=4){
+					if(c<=4 && c>=1){
+						//Prendo la lettera(che sarà adiacente ad l); se non è usata la aggiungo alla parola e controllo se è valida
+						Lettera lett = griglia.getGriglia().get(new Posizione(c,r));
+						if(!usate.contains(lett)){
+							usate.add(lett);
+							String check = "";
+							for(Lettera s : usate){
+								check += s.getLettera();
+							}
+							if(dao.checkParola(check)){
+								System.out.println(check);
+								ricerca(lett);
+							}
+							usate.remove(lett);
+						}
+					}
+				}
+			}
+		}
 	}
 	
 	

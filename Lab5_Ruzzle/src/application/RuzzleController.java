@@ -4,6 +4,7 @@ import java.net.URL;
 import java.util.*;
 import java.util.ResourceBundle;
 
+import application.model.Lettera;
 import application.model.RuzzleModel;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -75,6 +76,7 @@ public class RuzzleController {
     
     private RuzzleModel model;
     private List<Label> labels;
+    private List<Lettera> lettere;
     
     public void setModel(RuzzleModel model){
     	this.model = model;
@@ -82,9 +84,13 @@ public class RuzzleController {
 
     @FXML
     void doGenera(ActionEvent event) {
+    	//Genera serie casuale di lettere nella griglia
     	for(Label l : labels){
-    		l.setText("  "+model.randomChar().toUpperCase());
+    		l.setText(model.randomChar().toUpperCase());
+    		lettere.add(new Lettera(l.getText()));
     	}
+    	model.prepare(lettere);
+    	model.cercaParole();
     }
 
     @FXML
@@ -125,5 +131,6 @@ public class RuzzleController {
         labels.add(pos31);
         labels.add(pos32);
         labels.add(pos33);
+        lettere = new ArrayList<Lettera>();
     }
 }
